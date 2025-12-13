@@ -20,11 +20,11 @@ class Solution {
 
 class Solution {
     public int findDuplicate(int[] arr) {
-        int repeating = -1;
         Arrays.sort(arr);
+        int repeating = -1;
 
-        for (int i = 0; i < (arr.length - 1); i++) {
-            if (arr[i] == arr[i + 1]) {
+        for (int i = 1; i < arr.length; i++) {
+            if (arr[i] == arr[i - 1]) {
                 repeating = arr[i];
                 break;
             }
@@ -137,19 +137,23 @@ class Solution {
 class Solution {
     public int findDuplicate(int[] arr) {
         int i = 0;
-
         while (i < arr.length) {
             int correctIndex = arr[i] - 1;
-            if (arr[correctIndex] == arr[i]) {
+
+            if (arr[i] == arr[correctIndex]) {
                 i++;
             } else { // if arr[i] is not at its correct index
-                int temp = arr[correctIndex];
-                arr[correctIndex] = arr[i];
-                arr[i] = temp;
+                swap(arr, i, correctIndex);
             }
         }
-
+        // After rearranging, every value from 1 to n−1 settles at its correct index, and the repeated number ultimately lands at the last index.
         return arr[arr.length - 1];
+    }
+
+    private void swap(int[] arr, int i, int j) {
+        int temp = arr[i];
+        arr[i] = arr[j];
+        arr[j] = temp;
     }
 }
 
@@ -219,15 +223,13 @@ class Solution {
  Thus the Duplicate number is 2(at index 4 or 5).
   
   
- /*Optimisation
+ Optimisation :
  In other words all the distinct elements will occupy their correct index while remaining duplicate instances will occupy the remaining indexes,
  so this gurantees that last index will always carry duplicate number.
- */
-   
 */
 
 
-//Method 9
+//Method 9 (Binary Search on answer)
 
 class Solution {
     public int findDuplicate(int[] arr) {
@@ -263,8 +265,9 @@ class Solution {
   mid=(1+4)/2=2;
   (count of numbers in array) <= mid(i.e 2) =3.
   
-  (Had there been no duplicates in the array then "count of numbers in array <=2" would have been <= 2 but here exists more than 2 numbers in the array which are <=2 which means there lies/Exists a duplicate in the range (1,2)i.e(low,mid)(both inclusive) so our search space will be (1,2) i.e (low,mid))
-  thus high=mid i.e high =2;
+  (Had there been no duplicates in the array then "count of numbers in array <=2" would have been <= 2 but here exists more than 2 numbers in the array which are <=2 which means there lies/Exists a duplicate in the range (1,2)
+  i.e(low,mid)(both inclusive) so our search space will be (1,2) i.e (low,mid)) thus high=mid i.e high =2;
+
   i.e low=1 and high=2
   
   
@@ -273,9 +276,8 @@ class Solution {
   mid=(1+2)/2=1;
   (count of numbers in array) <= mid(i.e 1) =1.
   
-  (Had there been duplicates in the array then "count of numbers in array<=1" would have been more than 1,but here exists only 1 num. less <= 1 which means there Exists  no duplicate in the range (1,1) i.e(low,mid)(both inclusive) so our search space will be [2,2] i.e[mid+1,high]).
-  
-  thus low=mid+1 i.e low=2;
+  (Had there been duplicates in the array then "count of numbers in array<=1" would have been more than 1,but here exists only 1 num. less <= 1 which means there Exists  no duplicate in the range (1,1) i.e(low,mid)(both inclusive) so our search space will be [2,2]
+  i.e[mid+1,high]) thus low=mid+1 i.e low=2;
   
   i.e low=2 and high=2.
   
