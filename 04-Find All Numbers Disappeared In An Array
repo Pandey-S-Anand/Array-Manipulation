@@ -2,10 +2,11 @@
 
 class Solution {
     public List<Integer> findDisappearedNumbers(int[] arr) {
+        Arrays.sort(arr);
         List<Integer> notPresent = new ArrayList<>();
 
         for (int num = 1; num <= arr.length; num++) {
-            if (!linearSearch(arr, num)) {
+            if (!isPresent(arr, num)) {
                 notPresent.add(num);
             }
         }
@@ -13,15 +14,21 @@ class Solution {
         return notPresent;
     }
 
-    private boolean linearSearch(int[] arr, int key) {
+    private boolean isPresent(int[] arr, int key) {
         int low = 0, high = arr.length - 1;
 
         while (low <= high) {
-            if (arr[low] == key || arr[high] == key) {
+            int mid = low + (high - low) / 2;
+
+            if (arr[mid] == key) {
                 return true;
             }
-            low++;
-            high--;
+
+            if (key < arr[mid]) {
+                high = mid - 1;
+            } else {
+                low = mid + 1;
+            }
         }
 
         return false;
