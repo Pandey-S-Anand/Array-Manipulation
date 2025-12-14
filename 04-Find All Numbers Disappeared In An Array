@@ -36,7 +36,7 @@ class Solution {
 }
 
 
-//Good approach
+//Improved approach
 
 class Solution {
     public List<Integer> findDisappearedNumbers(int[] arr) {
@@ -58,7 +58,7 @@ class Solution {
 }
 
 
-//Better approach
+//Good approach
 
 class Solution {
     public List<Integer> findDisappearedNumbers(int[] arr) {
@@ -76,6 +76,40 @@ class Solution {
         }
 
         return notPresent;
+    }
+}
+
+
+//Better Approach
+
+class Solution {
+    public List<Integer> findDisappearedNumbers(int[] arr) {
+        List<Integer> notPresent = new ArrayList<>();
+        int i = 0;
+
+        while (i < arr.length) {
+            int correctIndex = arr[i] - 1;
+
+            if (arr[i] == arr[correctIndex]) {
+                i++;
+            } else {
+                swap(arr, i, correctIndex);
+            }
+        }
+
+        for (i = 0; i < arr.length; i++) {
+            if (arr[i] != i + 1) {
+                notPresent.add(i + 1);
+            }
+        }
+
+        return notPresent;
+    }
+
+    private void swap(int[] arr, int i, int j) {
+        int temp = arr[i];
+        arr[i] = arr[j];
+        arr[j] = temp;
     }
 }
 
