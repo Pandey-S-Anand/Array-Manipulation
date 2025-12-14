@@ -2,17 +2,14 @@
 
 class Solution {
     public int findDuplicate(int[] arr) {
-        int repeating = -1;
-
         for (int i = 0; i < arr.length; i++) {
             for (int j = i + 1; j < arr.length; j++) {
                 if (arr[i] == arr[j]) {
-                    repeating = arr[i];
-                    break;
+                    return arr[i];
                 }
             }
         }
-        return repeating;
+        return -1; // This case won’t ever occur based on the problem’s guarantees
     }
 }
 
@@ -21,17 +18,15 @@ class Solution {
 
 class Solution {
     public int findDuplicate(int[] arr) {
-        int repeating = -1;
         Arrays.sort(arr);
 
-        for (int i = 0; i < (arr.length - 1); i++) {
-            if (arr[i] == arr[i + 1]) {
-                repeating = arr[i];
-                break;
+        for (int i = 1; i < arr.length; i++) {
+            if (arr[i] == arr[i - 1]) {
+                return arr[i];
             }
         }
 
-        return repeating;
+        return -1;
     }
 }
 
@@ -41,17 +36,15 @@ class Solution {
 class Solution {
     public int findDuplicate(int[] arr) {
         Set<Integer> unique = new HashSet<>();
-        int repeated = -1;
 
         for (int num : arr) {
             if (unique.contains(num)) {
-                repeated = num;
-                break;
+                return num;
             }
             unique.add(num);
         }
 
-        return repeated;
+        return -1;
     }
 }
 
@@ -60,19 +53,17 @@ class Solution {
 
 class Solution {
     public int findDuplicate(int[] arr) {
-        int repeating = -1;
         boolean[] visited = new boolean[arr.length];
 
-        for (int val : arr) {
-            if (!visited[val]) {
-                visited[val] = true;
-            } else {
-                repeating = val;
-                break;
+        for (int num : arr) {
+            if (visited[num]) {
+                return num;
             }
+
+            visited[num] = true;
         }
 
-        return repeating;
+        return -1;
     }
 }
 
@@ -81,20 +72,17 @@ class Solution {
 
 class Solution {
     public int findDuplicate(int[] arr) {
-        int repeated = -1;
-
         for (int num : arr) {
             int value = Math.abs(num);
 
             if (arr[value] < 0) {
-                repeated = value;
-                break;
+                return value;
             }
 
             arr[value] *= -1;
         }
 
-        return repeated;
+        return -1;
     }
 }
 
@@ -125,7 +113,7 @@ class Solution {
 }
 
 
-//Method 8 (Cycle Sort)
+//Method 8 (Binary search on answer)
 
 class Solution {
     public int findDuplicate(int[] arr) {
@@ -199,49 +187,42 @@ class Solution {
 
 class Solution {
     public int findDuplicate(int[] arr) {
-        // The slow pointer moves 1 step while the fast pointer moves 2 steps at a time.
-        // If they meet, then there is a cycle. The starting point of that cycle is the repeating number.
+        // slow moves 1 step at a time, fast moves 2 steps. If they meet, it confirms the presence of a cycle.
+        int slow = arr[0];
+        int fast = arr[arr[0]];
         
-        int slowPointer = arr[0];
-        int fastPointer = arr[arr[0]];
-        
-        // CYCLE DETECTION using Floyd's Cycle Detection algorithm
-        while (slowPointer != fastPointer) {
-            slowPointer = arr[slowPointer];
-            fastPointer = arr[arr[fastPointer]];
+        // PHASE 1: Detect the cycle using Floyd's algorithm
+        while (slow != fast) {
+            slow = arr[slow];
+            fast = arr[arr[fast]];
         }
         
-        // DETECTING THE STARTING POINT OF THE CYCLE
-        // Reset one pointer to the beginning and move both pointers one step at a time.
-        // They will meet at the starting point of the cycle, which is the repeating number.
-        fastPointer = 0; // or slowPointer = 0
-        while (slowPointer != fastPointer) {
-            slowPointer = arr[slowPointer];
-            fastPointer = arr[fastPointer];
+        // PHASE 2: Find the starting point of the cycle.
+        // Move slow to the beginning (index 0) and advance both slow and fast one step at a time. Their meeting point is the duplicate number.
+        fast = 0;
+        while (slow != fast) {
+            slow = arr[slow];
+            fast = arr[fast];
         }
         
-        return slowPointer; // both pointers meet at the starting point of the cycle
+        return slow; // both meet at the repeating element
     }
 }
 
-
-
 /*
-    let’s take an example and dry run on it to understand.
+    This algorithm relies on the pigeonhole principle and the problem’s strict constraints:
 
-       0   1   2   3   4   5   6   7   8   9
-     | 2 | 5 | 9 | 6 | 9 | 3 | 8 | 9 | 7 | 1 |
-  
-     
-       2 -- 9 -- 1 -- 5
-            |         |
-            |         3
-            |         |
-            7 -- 8 -- 6
+        - The array length is (n + 1)
+        - Every value is in the range [1..n]
 
-  Initially, we have 2, then we go to the second index, we have 9, then we go to the 9th index, 
-  we have 1, then we go to the 1st index, we again have 5, 
-  then we go to the 5th index, we have 3, then we go to the 3rd index, 
-  we get 6, then we go to the 6th index, we get 8, then we go to the 8th index, 
-  we get 7, then we go to the 7th index and we get 9 and here cycle is formed.
+    Since there are n possible values but (n + 1) positions filled with values from 1..n,
+    at least one value MUST appear more than once — duplication is mathematically guaranteed.
+    This guarantee is crucial because Floyd’s cycle detection works only if a cycle exists.
+
+    Two different indices have same value → a repeated value causes two different indices to point to the same spot  → loop.
+
+    Without these constraints:
+        - No duplicate may exist → no cycle → slow and fast would never meet,
+          causing an infinite loop.
+        - A value outside the range [1..n] could also lead to out-of-bounds indexing.
 */
