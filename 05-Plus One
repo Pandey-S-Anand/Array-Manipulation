@@ -2,36 +2,27 @@
 
 class Solution {
     public int[] plusOne(int[] digits) {
-        boolean isAllNines = true;
+        int i = digits.length - 1, carry = 1; // since we are adding one
+        LinkedList<Integer> incrementedNumber = new LinkedList<>();
 
-        for (int digit : digits) {
-            if (digit != 9) {
-                isAllNines = false;
-                break;
-            }
+        while (i >= 0 || carry == 1) {
+            int digit = i >= 0 ? digits[i--] : 0;
+            int sum = digit + carry;
+            incrementedNumber.addFirst(sum % 10);
+            carry = sum / 10;
         }
 
-        if (isAllNines) {
-            int[] incrementedNumber = new int[digits.length + 1]; // Ex: digits={9,9,9} +1 = incrementedNumber={1,0,0,0}
-            incrementedNumber[0] = 1;
-            return incrementedNumber;
-        }
-
-        return incrementDigits(digits);
+        return toArray(incrementedNumber);
     }
 
-    public int[] incrementDigits(int[] digits) {
-        int[] incrementedNumber = new int[digits.length];
+    private int[] toArray(List<Integer> list) {
+        int[] arr = new int[list.size()];
 
-        incrementedNumber[digits.length - 1] = (digits[digits.length - 1] + 1) % 10;
-        int carry = (digits[digits.length - 1] + 1) / 10;
-
-        for (int i = digits.length - 2; i >= 0; i--) {
-            incrementedNumber[i] = (digits[i] + carry) % 10;
-            carry = (digits[i] + carry) / 10;
+        for (int i = 0; i < arr.length; i++) {
+            arr[i] = list.get(i);
         }
 
-        return incrementedNumber;
+        return arr;
     }
 }
 
@@ -40,19 +31,21 @@ class Solution {
 
 class Solution {
     public int[] plusOne(int[] digits) {
-        // Traverse the array from right to left
+        int carry = 1;
+
         for (int i = digits.length - 1; i >= 0; i--) {
-            if (digits[i] < 9) {
-                digits[i] += 1; // Add 1 and return the updated array
-                return digits;
-            } else {
-                digits[i] = 0; // If the current digit is 9, set it to 0
+            int sum = digits[i] + carry;
+            digits[i] = sum % 10;
+            carry = sum / 10;
+
+            if (carry == 0) {
+                return digits; // no need to continue once carry is gone
             }
         }
 
-        // If the array consists of all 9s, e.g., 99 or 999, return a new array
+        // If carry is still 1, it means the number was all 9s (e.g., 9, 99, 999).  The result becomes 100...0, so we need a new array with one extra digit.
         int[] incrementedNumber = new int[digits.length + 1];
-        incrementedNumber[0] = 1; // Set the first digit to 1
+        incrementedNumber[0] = 1;
 
         return incrementedNumber;
     }
