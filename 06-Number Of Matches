@@ -1,27 +1,160 @@
-class Solution {
-    public static void getAnswer(int arr[], int answer[], int n) {
-        Map<Integer, Integer> playerRatingIndexMap = new HashMap<>();
+//Bruteforce approach
 
-        for (int i = 0; i < n; i++) {
-            playerRatingIndexMap.put(arr[i], i);
+class Solution {
+    public static int[] getAnswer(int[] ratings) {
+        // Stores: playerRating → total matches played by this player
+        Map<Integer, Integer> matchesPlayed = new HashMap<>();
+
+        // Players currently participating in this round
+        List<Integer> currentRoundPlayers = new ArrayList<>();
+
+        // Initialize players and set initial match count to zero
+        for (int rating : ratings) {
+            currentRoundPlayers.add(rating);
+            matchesPlayed.put(rating, 0);
         }
 
-        int currentSize = n;
-        while (currentSize != 1) {
-            int newSize = 0;
-            for (int i = 0; i < currentSize; i += 2) {
-                if (i + 1 < currentSize) {
-                    // Increment match count for both players
-                    answer[playerRatingIndexMap.get(arr[i])]++;
-                    answer[playerRatingIndexMap.get(arr[i + 1])]++;
-                    // Store the winner for the next round
-                    arr[newSize++] = Math.max(arr[i], arr[i + 1]);
+        // Keep running rounds until only one player remains
+        while (currentRoundPlayers.size() > 1) {
+            // Winners (or lone survivors) advance to this list
+            List<Integer> nextRoundPlayers = new ArrayList<>();
+
+            // Process players in pairs
+            for (int i = 0; i < currentRoundPlayers.size(); i += 2) {
+                // If there's an odd player out, send them directly to the next round
+                if (i + 1 == currentRoundPlayers.size()) {
+                    nextRoundPlayers.add(currentRoundPlayers.get(i));
                 } else {
-                    // If odd number of players, the last player advances to the next round automatically
-                    arr[newSize++] = arr[i];
+                    // Match between two players
+                    int player1 = currentRoundPlayers.get(i);
+                    int player2 = currentRoundPlayers.get(i + 1);
+
+                    // Both players played one match
+                    matchesPlayed.put(player1, matchesPlayed.get(player1) + 1);
+                    matchesPlayed.put(player2, matchesPlayed.get(player2) + 1);
+
+                    // Higher-rated player wins and moves forward
+                    int winner = Math.max(player1, player2);
+                    nextRoundPlayers.add(winner);
                 }
             }
-            currentSize = newSize;
+
+            // Move to the next round
+            currentRoundPlayers = nextRoundPlayers;
         }
+
+        // Convert final map values into output array
+        for (int i = 0; i < ratings.length; i++) {
+            ratings[i] = matchesPlayed.get(ratings[i]);
+        }
+
+        return ratings;
+    }
+}
+
+
+
+//Better Approach
+
+class Solution {
+    public static int[] getAnswer(int[] ratings) {
+        // Maps each player's rating to their original position in the input.
+        Map<Integer, Integer> ratingIndexMap = new HashMap<>();
+
+        // Players in the ongoing round.
+        List<Integer> currentRoundPlayers = new ArrayList<>();
+
+        /**
+         * Tournament initialization:
+         * - Add all players to the first round.
+         * - Record each rating’s original index.
+         * - Reset the ratings[] array to store match counts.
+         */
+        for (int i = 0; i < ratings.length; i++) {
+            currentRoundPlayers.add(ratings[i]);
+            ratingIndexMap.put(ratings[i], i);
+            ratings[i] = 0;  // reused as match counter
+        }
+
+
+        while (currentRoundPlayers.size() > 1) {
+            // Stores winners (and auto-advancing odd players) for the next round.
+            List<Integer> nextRoundPlayers = new ArrayList<>();
+
+            for (int i = 0; i < currentRoundPlayers.size(); i += 2) {
+
+                // Auto-advance if there is no opponent
+                if (i + 1 == currentRoundPlayers.size()) {
+                    nextRoundPlayers.add(currentRoundPlayers.get(i));
+                } else {
+                    int player1 = currentRoundPlayers.get(i);
+                    int player2 = currentRoundPlayers.get(i + 1);
+
+                    // Increment match count for both players
+                    ratings[ratingIndexMap.get(player1)]++;
+                    ratings[ratingIndexMap.get(player2)]++;
+
+                    // Winner moves to the next round
+                    nextRoundPlayers.add(Math.max(player1, player2));
+                }
+            }
+
+            // Prepare for further rounds
+            currentRoundPlayers = nextRoundPlayers;
+        }
+
+        // Array now contains match counts aligned to original input positions
+        return ratings;
+    }
+}
+
+
+
+//Optimal approach
+
+
+class Solution {
+    public static int[] getAnswer(int[] ratings) {
+        // Stores total matches played by each player (indexed by original position)
+        int[] matchCount = new int[ratings.length];
+
+        // Maps rating → original index for constant-time match count updates
+        Map<Integer, Integer> ratingToIndex = new HashMap<>();
+        for (int i = 0; i < ratings.length; i++) {
+            ratingToIndex.put(ratings[i], i);
+        }
+
+        // Use ratings array directly as the current tournament round
+        int[] currentRound = ratings;
+        int[] nextRound = new int[ratings.length];
+
+        // Tracks how many players are currently active in this round
+        int roundSize = ratings.length;
+
+        while (roundSize > 1) {
+            int idx = 0; // counts how many players have been placed in nextRound
+
+            for (int i = 0; i < roundSize; i += 2) {
+                // If the last player is unpaired → auto-advance
+                if (i + 1 == roundSize) {
+                    nextRound[idx++] = currentRound[i];
+                } else {
+                    int playerA = currentRound[i];
+                    int playerB = currentRound[i + 1];
+
+                    // Both players participated in this match
+                    matchCount[ratingToIndex.get(playerA)]++;
+                    matchCount[ratingToIndex.get(playerB)]++;
+
+                    // Higher-rated player moves to next round
+                    nextRound[idx++] = Math.max(playerA, playerB);
+                }
+            }
+
+            currentRound = nextRound;
+            roundSize = idx;
+        }
+
+        return matchCount;
     }
 }
