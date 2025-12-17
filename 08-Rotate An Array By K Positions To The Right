@@ -10,7 +10,11 @@ class Solution {
 
     private void rightRotateBy1(int[] arr) {
         int temp = arr[arr.length - 1];
-        System.arraycopy(arr, 0, arr, 1, arr.length - 1);
+
+        for (int i = arr.length - 1; i > 0; i--) {
+            arr[i] = arr[i - 1];
+        }
+
         arr[0] = temp;
     }
 }
@@ -23,9 +27,17 @@ class Solution {
         k = k % arr.length;
         int[] temp = new int[k];
 
-        System.arraycopy(arr, arr.length - k, temp, 0, k);
-        System.arraycopy(arr, 0, arr, k, arr.length - k);
-        System.arraycopy(temp, 0, arr, 0, temp.length);
+        for (int i = 0; i < temp.length; i++) {
+            temp[i] = arr[arr.length - k + i];
+        }
+
+        for (int i = arr.length - 1 - k; i >= 0; i--) {
+            arr[i + k] = arr[i];
+        }
+
+        for (int i = 0; i < k; i++) {
+            arr[i] = temp[i];
+        }
     }
 }
 
@@ -38,11 +50,12 @@ class Solution {
         int[] twice = new int[2 * arr.length];
 
         for (int i = 0; i < arr.length; i++) {
-            twice[i] = arr[i];
-            twice[arr.length + i] = arr[i];
+            twice[i] = twice[arr.length + i] = arr[i];
         }
 
-        System.arraycopy(twice, arr.length - k, arr, 0, arr.length);
+        for (int i = 0; i < arr.length; i++) {
+            arr[i] = twice[arr.length - k + i];
+        }
     }
 }
 
@@ -68,41 +81,5 @@ class Solution {
         int temp = arr[i];
         arr[i] = arr[j];
         arr[j] = temp;
-    }
-}
-
-
-//Method 5 (Juggling Algorithm)
-
-class Solution {
-    public void rotate(int[] arr, int k) {
-        k = k % arr.length; // In case the rotating factor is greater than array length
-        int cycles = gcd(arr.length, k);
-
-        for (int i = 0; i < cycles; i++) {
-            int currentIndex = (arr.length - 1 - i);
-            int temp = arr[arr.length - 1 - i];
-
-            while (true) {
-                int nextIndex = (currentIndex - k + arr.length) % arr.length;
-
-                if (nextIndex == (arr.length - 1 - i)) {
-                    arr[currentIndex] = temp;
-                    break;
-                } else {
-                    arr[currentIndex] = arr[nextIndex];
-                    currentIndex = nextIndex;
-                }
-            }
-        }
-    }
-
-    private int gcd(int divisor, int dividend) {
-        int remainder = dividend % divisor;
-        if (remainder == 0) {
-            return divisor;
-        }
-
-        return gcd(remainder, divisor);
     }
 }
