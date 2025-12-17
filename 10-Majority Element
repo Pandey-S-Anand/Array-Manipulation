@@ -20,34 +20,13 @@ class Solution {
 }
 
 
-//Improved Approach
+//Good Approach
 
 class Solution {
     public int majorityElement(int[] arr) {
         Arrays.sort(arr);
         // Since the array is guaranteed to contain the majority element, so it will definitely occupy the middle index i.e N / 2.
         return arr[arr.length / 2];
-    }
-}
-
-
-//Good Approach
-
-class Solution {
-    public int majorityElement(int[] arr) {
-        Map<Integer, Integer> frequencyMap = new HashMap<>();
-
-        for (int num : arr) {
-            frequencyMap.put(num, frequencyMap.getOrDefault(num, 0) + 1);
-        }
-
-        for (int num : frequencyMap.keySet()) {
-            if (frequencyMap.get(num) > (arr.length / 2)) {
-                return num;
-            }
-        }
-        // This return statement will never be reached as majority element always exists in the array.
-        return -1;
     }
 }
 
@@ -60,6 +39,7 @@ class Solution {
 
         for (int num : arr) {
             frequencyMap.put(num, frequencyMap.getOrDefault(num, 0) + 1);
+
             if (frequencyMap.get(num) > (arr.length / 2)) {
                 return num;
             }
@@ -73,6 +53,53 @@ class Solution {
 
 
 //Optimal Approach (Boyer-Moore Voting Algorithm)
+
+/*
+ Moore’s Voting Algorithm intuition:
+
+ If an element appears more than ⌊n/2⌋ times, it is called the majority element.
+ Such an element can be at most one in the array.
+
+ The algorithm maintains a candidate and a count.
+ - When the current element equals the candidate, the count is incremented.
+ - Otherwise, the count is decremented.
+
+ Core funda:
+ A true majority element can never be outnumbered in the entire array.
+
+ The key idea is the count == 0 case.
+ When the count becomes zero, we discard the current candidate.
+ This does NOT mean the candidate is not the majority element.
+ It only means that, in the prefix processed so far, the current candidate
+ and all other elements combined have occurred the same number of times.
+
+ Important inference at count == 0:
+ At this point, neither the current candidate nor the elements that canceled it
+ can be considered a majority element within that prefix.
+ In other words, no element in the processed prefix has any majority advantage.
+ The prefix is completely neutral and provides no information about the final
+ majority element, so it can be safely ignored.
+
+ Example:
+   arr = [7, 7, 2, 3, 7]
+
+   Step-by-step:
+   - Start: candidate = 7, count = 1
+   - Next 7 → count = 2
+   - Next 2 → count = 1
+   - Next 3 → count = 0
+     (the candidate 7 and all other elements together are perfectly balanced)
+   - Next 7 → new candidate = 7, count = 1
+
+ Even if the majority element gets neutralized in a prefix, it cannot be
+ completely canceled across the entire array.
+ If a majority element exists, it will re-emerge in the remaining suffix
+ and survive all future cancellations.
+
+ Conceptually, the algorithm performs pairwise cancellation of different elements.
+ The majority element survives all cancellations and ends up as the final candidate.
+*/
+
 
 class Solution {
     public int majorityElement(int[] arr) {
