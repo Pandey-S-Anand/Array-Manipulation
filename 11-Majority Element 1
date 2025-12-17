@@ -1,16 +1,16 @@
 //Bruteforce Approach
 
 class Solution {
-    static int majorityElement(int arr[], int n) {
-        for (int i = 0; i < n; i++) {
+    static int majorityElement(int arr[]) {
+        for (int i = 0; i < arr.length; i++) {
             int count = 1;
-            for (int j = i + 1; j < n; j++) {
+            for (int j = i + 1; j < arr.length; j++) {
                 if (arr[i] == arr[j]) {
                     count++;
                 }
             }
 
-            if (count > (n / 2)) {
+            if (count > (arr.length / 2)) {
                 return arr[i];
             }
         }
@@ -19,20 +19,21 @@ class Solution {
     }
 }
 
-//Improved Approach
+
+//Good Approach
 
 class Solution {
-    static int majorityElement(int arr[], int n) {
+    static int majorityElement(int arr[]) {
         Arrays.sort(arr);
 
-        int majorityCandidate = arr[n / 2], voteCount = 0;
+        int majorityCandidate = arr[arr.length / 2], voteCount = 0;
 
         for (int num : arr) {
             if (num == majorityCandidate) {
                 voteCount++;
             }
 
-            if (voteCount > (n / 2)) {
+            if (voteCount > (arr.length / 2)) {
                 return majorityCandidate;
             }
         }
@@ -43,31 +44,11 @@ class Solution {
 }
 
 
-//Good Approach
-
-class Solution {
-    static int majorityElement(int arr[], int n) {
-        Map<Integer, Integer> frequencyMap = new HashMap<>();
-
-        for (int num : arr) {
-            frequencyMap.put(num, frequencyMap.getOrDefault(num, 0) + 1);
-        }
-
-        for (int num : frequencyMap.keySet()) {
-            if (frequencyMap.get(num) > (arr.length / 2)) {
-                return num;
-            }
-        }
-        // majority element doesnot exists in the array
-        return -1;
-    }
-}
-
 
 //Better Approach
 
 class Solution {
-    static int majorityElement(int arr[], int n) {
+    static int majorityElement(int arr[]) {
         Map<Integer, Integer> frequencyMap = new HashMap<>();
 
         for (int num : arr) {
@@ -86,7 +67,7 @@ class Solution {
 //Optimal Approach
 
 class Solution {
-    static int majorityElement(int arr[], int n) {
+    static int majorityElement(int arr[]) {
         int majorityCandidate = arr[0];
         int voteCount = 1;
 
