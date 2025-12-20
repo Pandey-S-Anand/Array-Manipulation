@@ -1,8 +1,9 @@
 //Bruteforce Approach
 
 class Solution {
-    public int sumAllSubarrays(int[] arr) {
+    public int subarraySum(int[] arr) {
         int totalSum = 0;
+
         for (int start = 0; start < arr.length; start++) {
             for (int end = start; end < arr.length; end++) {
                 for (int range = start; range <= end; range++) {
@@ -19,8 +20,9 @@ class Solution {
 //Better Approach
 
 class Solution {
-    public static int sumAllSubarrays(int[] arr) {
+    public int subarraySum(int[] arr) {
         int totalSum = 0;
+
         for (int start = 0; start < arr.length; start++) {
             int subArraySum = 0;
             for (int end = start; end < arr.length; end++) {
@@ -37,7 +39,7 @@ class Solution {
 //Optimal Approach
 
 class Solution {
-    public int sumAllSubarrays(int[] arr) {
+    public int subarraySum(int[] arr) {
         int totalSum = 0;
 
         for (int i = 0; i < arr.length; i++) {
@@ -45,12 +47,58 @@ class Solution {
         }
 
         return totalSum;
+
     }
 }
-
-
 /*
-LOGIC: 
+ Intuition behind the formula: arr[i] * (i + 1) * (n - i)
+
+ Goal:
+ Compute the sum of all subarray sums without generating subarrays explicitly.
+
+ Key idea:
+ Instead of summing every subarray, calculate how much each element contributes
+ to the final result.
+
+ For a fixed element arr[i]:
+ - It contributes its value once for every subarray in which it appears.
+ - So we need to count how many subarrays include arr[i].
+
+ How many subarrays include arr[i]?
+
+ A subarray is defined by a start index and an end index.
+ For arr[i] to be part of a subarray, BOTH of the following must be true:
+     start <= i <= end
+
+ 1) Start index choices:
+    The subarray can start at any index from 0 to i (inclusive).
+    These are the only valid start positions for which a subarray can
+    possibly include arr[i].
+
+ 2) End index choices:
+    The subarray can end at any index from i to n - 1 (inclusive).
+    End positions before i are not allowed, because such subarrays
+    would end before reaching arr[i].
+
+ Important clarification:
+ We are NOT saying that every subarray starting at index 0 (or any index <= i)
+ automatically contains arr[i].
+ We only count (start, end) pairs where start <= i AND end >= i.
+ Invalid pairs like (start = 0, end = i - 1) are never considered.
+
+ For every valid start (<= i), we can pair it with every valid end (>= i).
+ Hence, total number of subarrays containing arr[i] is:
+
+     (i + 1) * (n - i)
+
+ Contribution of arr[i] to the total sum:
+     arr[i] * (number of subarrays containing it)
+   = arr[i] * (i + 1) * (n - i)
+
+ Summing this contribution for all indices gives the total sum of all subarrays.
+
+
+Dry run: 
 
 arr[]={1,2,3,4};
 
@@ -76,6 +124,6 @@ Generalised formula = (n-i)+(n-i)*i
                     = (n-i)*(1+(1*i))
                     = (n-i)*(i+1)
                       
-Contribution of each element in total sum is = arr[i]*count of arr[i]
-                                             = arr[i]*(n-i)*(i+1)
+Contribution of each element in total sum is = arr[i] * count of arr[i]
+                                             = arr[i] * (n-i)*(i+1)
 */
