@@ -50,6 +50,7 @@ class Solution {
 
     }
 }
+
 /*
  Intuition behind the formula: arr[i] * (i + 1) * (n - i)
 
@@ -60,9 +61,7 @@ class Solution {
  Instead of summing every subarray, calculate how much each element contributes
  to the final result.
 
- For a fixed element arr[i]:
- - It contributes its value once for every subarray in which it appears.
- - So we need to count how many subarrays include arr[i].
+ For a fixed element arr[i]:  we need to count how many subarrays include arr[i].
 
  How many subarrays include arr[i]?
 
@@ -73,29 +72,20 @@ class Solution {
  1) Start index choices:
     The subarray can start at any index from 0 to i (inclusive).
     These are the only valid start positions for which a subarray can
-    possibly include arr[i].
+    possibly include arr[i], giving (i + 1) possible starting positions.
 
  2) End index choices:
     The subarray can end at any index from i to n - 1 (inclusive).
     End positions before i are not allowed, because such subarrays
-    would end before reaching arr[i].
+    would end before reaching arr[i], giving (n - i) possible ending positions.
 
- Important clarification:
- We are NOT saying that every subarray starting at index 0 (or any index <= i)
- automatically contains arr[i].
- We only count (start, end) pairs where start <= i AND end >= i.
- Invalid pairs like (start = 0, end = i - 1) are never considered.
 
- For every valid start (<= i), we can pair it with every valid end (>= i).
- Hence, total number of subarrays containing arr[i] is:
-
-     (i + 1) * (n - i)
+ Therefore, the total number of subarrays that include arr[i] is:
+     totalSubarrays = (i + 1) * (n - i)
 
  Contribution of arr[i] to the total sum:
-     arr[i] * (number of subarrays containing it)
+   = arr[i] * totalSubarrays
    = arr[i] * (i + 1) * (n - i)
-
- Summing this contribution for all indices gives the total sum of all subarrays.
 
 
 Dry run: 
