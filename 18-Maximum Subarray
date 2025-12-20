@@ -100,10 +100,24 @@ class Solution {
 class Solution {
     public int maxSubArray(int[] arr) {
         int currentSum = 0, maxSum = Integer.MIN_VALUE;
+
         for (int num : arr) {
             currentSum += num;
             maxSum = Math.max(currentSum, maxSum);
-
+            /*
+            Why do we reset currentSum to 0 when it becomes negative?
+            
+            If currentSum < 0, carrying it forward can never help form a maximum
+            subarray in the future.
+            
+            - If the next element is positive, adding it to a negative currentSum
+            will result in a smaller sum than starting a new subarray from that element.
+            - If the next element is negative, the sum will decrease even further,
+            again making it worse than starting fresh.
+            
+            Therefore, once currentSum becomes negative, it is optimal to discard it
+            and start a new subarray from the next position.
+            */
             if (currentSum < 0) {
                 currentSum = 0;
             }
