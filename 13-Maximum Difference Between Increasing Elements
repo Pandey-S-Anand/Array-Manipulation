@@ -17,42 +17,26 @@ class Solution {
 }
 
 
-//Optimal Implementation
+//Optimal Approach
 
 class Solution {
     public int maximumDifference(int[] arr) {
-        int maxDiff = -1, maxSoFar = arr[arr.length - 1];
+        // Stores the maximum difference found so far (initially -1 if no valid pair exists)
+        int maxDiff = -1;
+        // Tracks the maximum element seen to the right of the current index
+        int maxSoFar = arr[arr.length - 1];
 
-        for (int i = (arr.length - 2); i >= 0; i--) {
-            if ((arr[i] < maxSoFar) && (maxSoFar - arr[i]) > maxDiff) {
-                maxDiff = (maxSoFar - arr[i]);
-            }
-
-            if (arr[i] > maxSoFar) {
+        // Traverse from right to left so that maxSoFar always represents the best possible value for arr[j] where j > i
+        for (int i = arr.length - 2; i >= 0; i--) {
+            // If a larger element exists to the right, compute potential difference
+            if (arr[i] < maxSoFar) {
+                maxDiff = Math.max(maxDiff, maxSoFar - arr[i]);
+            } else {   // Otherwise, update maxSoFar since this element is larger
                 maxSoFar = arr[i];
             }
         }
 
-        return maxDiff;
-    }
-}
-
-//Aliter Implementation
-
-class Solution {
-    public int maximumDifference(int[] arr) {
-        int maxDiff = -1, minSoFar = arr[0];
-
-        for (int i = 1; i < arr.length; i++) {
-            if ((arr[i] > minSoFar) && (arr[i] - minSoFar) > maxDiff) {
-                maxDiff = (arr[i] - minSoFar);
-            }
-
-            if (arr[i] < minSoFar) {
-                minSoFar = arr[i];
-            }
-        }
-
+        // Returns the maximum arr[j] - arr[i] such that j > i and arr[j] > arr[i], or -1 if no such pair exists
         return maxDiff;
     }
 }
