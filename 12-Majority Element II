@@ -1,90 +1,113 @@
 /*
-There can only be three scenarios :
-No elements with count more than n/3 exists in the array
-1 elements with count more than n/3 exists in the array
-2 elements with count more than n/3 exists in the array
+ Observation for majority elements with frequency > N/3:
 
-Therefore, at most two elements can each appear more than 𝑛 / 3 times in the array.
+ Let the size of the array be N.
+
+ The array can be conceptually divided into three equal parts:
+     N/3 + N/3 + N/3 = 3N/3 = N
+
+ If an element is considered a majority element only if it appears
+ more than N/3 times, then there can be at most two such elements.
+
+ Reasoning:
+ - If three different elements each appeared more than N/3 times, then:
+
+       > N/3 + > N/3 + > N/3  >  N
+
+   which is impossible, since the total number of elements in the array is N.
+
+ Therefore:
+ - There cannot be three elements occurring more than N/3 times.
+ - At most two elements can have frequency greater than N/3.
+
+ Hence, the number of elements with frequency > N/3 can only be:
+ - 0 (no such elements),
+ - 1, or
+ - at most 2.
+
+ ------------------------------------------------------------------
+
+ Generalization (frequency > N/K):
+
+ The same logic extends to a general threshold N/K.
+
+ The array can be conceptually divided into K equal parts:
+     N/K + N/K + ... + N/K  (K times) = N
+
+ If an element is defined as a majority element only if it appears
+ more than N/K times, then there can be at most (K - 1) such elements.
+
+ Reasoning:
+ - If K different elements each appeared more than N/K times, then:
+
+       > N/K + > N/K + ... + > N/K  (K times)  >  N
+
+   which is impossible.
+
+ Therefore, the number of elements with frequency > N/K can only be:
+ - 0, 1, ..., or at most (K - 1).
+
+ This observation forms the theoretical basis for the extended
+ Moore’s Voting Algorithm, which tracks at most (K - 1) candidates.
 */
+
 
 //Bruteforce Approach
 
 class Solution {
     public List<Integer> majorityElement(int[] arr) {
         List<Integer> majorityElements = new ArrayList<>();
-        boolean[] visited = new boolean[arr.length];
 
         for (int i = 0; i < arr.length; i++) {
-            int count = 1;
 
-            if (visited[i]) {
+            // Skip elements already processed and marked as visited
+            if (arr[i] == Integer.MIN_VALUE) {
                 continue;
             }
 
+            int count = 1; // Count occurrences of arr[i]
+
+            // Count how many times arr[i] appears ahead in the array
             for (int j = i + 1; j < arr.length; j++) {
                 if (arr[i] == arr[j]) {
+                    // Mark duplicate as visited to prevent recounting
+                    arr[j] = Integer.MIN_VALUE;
                     count++;
-                    visited[j] = true;
                 }
             }
 
+            // Check if the current element is a majority (> n/3)
             if (count > (arr.length / 3)) {
                 majorityElements.add(arr[i]);
-            }
 
-            if (majorityElements.size() == 2) {
-                break;
-            }
-        }
-
-        return majorityElements;
-    }
-}
-
-
-
-//Good Approach
-
-class Solution {
-    public List<Integer> majorityElement(int[] arr) {
-        List<Integer> majorityElements = new ArrayList<>();
-
-        for (int i = 0; i < arr.length; i++) {
-            int count = 1;
-
-            for (int j = i + 1; j < arr.length; j++) {
-                if (arr[i] == arr[j]) {
-                    count++;
+                // Since there can be at most two majority elements (> n/3), we can safely return once we find two.
+                if (majorityElements.size() == 2) {
+                    return majorityElements;
                 }
             }
-
-            if (count > (arr.length / 3) && !majorityElements.contains(arr[i])) {
-                majorityElements.add(arr[i]);
-            }
-
-            if (majorityElements.size() == 2) {
-                break;
-            }
         }
 
+        // Return the list of majority elements (0, 1, or 2 elements)
         return majorityElements;
     }
 }
+
+
 
 
 //Better Approach
 
 class Solution {
-    public List<Integer> findMajorityElements(int[] nums) {
+    public List<Integer> majorityElement(int[] arr) {
         List<Integer> majorityElements = new ArrayList<>();
         Map<Integer, Integer> frequencyMap = new HashMap<>();
 
-        for (int num : nums) {
+        for (int num : arr) {
             frequencyMap.put(num, frequencyMap.getOrDefault(num, 0) + 1);
         }
 
         for (int num : frequencyMap.keySet()) {
-            if (frequencyMap.get(num) > (nums.length / 3)) {
+            if (frequencyMap.get(num) > (arr.length / 3)) {
                 majorityElements.add(num);
             }
 
@@ -103,54 +126,59 @@ class Solution {
 
 class Solution {
     public List<Integer> majorityElement(int[] arr) {
-        int majorityCandidate1 = -1, majorityCandidate2 = -1, voteCount1 = 0, voteCount2 = 0;
+        int majorityCandidate1 = Integer.MIN_VALUE, majorityCandidate2 = Integer.MIN_VALUE, vote1 = 0, vote2 = 0;
+        List<Integer> majorityElements = new ArrayList<>();
 
         for (int num : arr) {
             /*
-             * When voteCount1 is zero, it indicates that majorityCandidate1 is no
-             * longer a potential majority candidate and a new candidate should be
+             * When vote1 is zero, it indicates that majorityCandidate1 is no
+             * longer a majority candidate in the array traversed so far and a new candidate should be
              * considered for majorityCandidate1. However, this new candidate should not
              * be the same as majorityCandidate2 to maintain distinct candidates. This is
              * why we use the check 'num != majorityCandidate2'.
-             * Similarly, when voteCount2 is zero, it indicates that majorityCandidate2
-             * is no longer a potential majority candidate and a new candidate should be
+             * Similarly, when vote2 is zero, it indicates that majorityCandidate2
+             * is no longer a majority candidate in the array traversed so far and a new candidate should be
              * considered for majorityCandidate2. However, this new candidate should not
              * be the same as majorityCandidate1 to maintain distinct candidates.
              * Thus, we use the check 'num != majorityCandidate1'.
              */
-            if (voteCount1 == 0 && num != majorityCandidate2) {
+            if (vote1 == 0 && num != majorityCandidate2) {
                 majorityCandidate1 = num;
-                voteCount1 = 1;
+                vote1 = 1;
             } else if (num == majorityCandidate1) {
-                voteCount1++;
-            } else if (voteCount2 == 0 && num != majorityCandidate1) {
+                vote1++;
+            } else if (vote2 == 0 && num != majorityCandidate1) {
                 majorityCandidate2 = num;
-                voteCount2 = 1;
+                vote2 = 1;
             } else if (num == majorityCandidate2) {
-                voteCount2++;
+                vote2++;
             } else {
-                voteCount1--;
-                voteCount2--;
+                /*
+                When the current number matches neither majorityCandidate1 nor
+                majorityCandidate2, it represents a competing element.
+                We decrement both vote1 and vote2 to reflect pairwise cancellation
+                */
+                vote1--;
+                vote2--;
             }
         }
 
-        List<Integer> majorityElements = new ArrayList<>();
-        voteCount1 = 0;
-        voteCount2 = 0;
+        vote1 = 0;
+        vote2 = 0;
 
         for (int num : arr) {
             if (num == majorityCandidate1) {
-                voteCount1++;
+                vote1++;
             } else if (num == majorityCandidate2) {
-                voteCount2++;
+                vote2++;
             }
         }
 
-        if (voteCount1 > (arr.length / 3)) {
+        if (vote1 > (arr.length / 3)) {
             majorityElements.add(majorityCandidate1);
         }
 
-        if (voteCount2 > (arr.length / 3)) {
+        if (vote2 > (arr.length / 3)) {
             majorityElements.add(majorityCandidate2);
         }
 
