@@ -147,7 +147,7 @@ class Solution {
                 vote1 = 1;
             } else if (num == majorityCandidate1) {
                 vote1++;
-            } else if (vote2 == 0 && num != majorityCandidate1) {
+            } else if (vote2 == 0) { // obv. num != majorityCandidate1
                 majorityCandidate2 = num;
                 vote2 = 1;
             } else if (num == majorityCandidate2) {
