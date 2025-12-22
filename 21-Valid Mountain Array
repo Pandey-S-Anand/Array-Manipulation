@@ -8,7 +8,7 @@ class Solution {
             return false;
         }
 
-        for (int i = 1; i <= arr.length - 2; i++) {
+        for (int i = 1; i < arr.length - 1; i++) {
             if (isStrictlyIncreasingUntil(arr, i) && isStrictlyDecreasingFrom(arr, i)) {
                 return true;
             }
@@ -28,8 +28,8 @@ class Solution {
     }
 
     private boolean isStrictlyDecreasingFrom(int[] arr, int index) {
-        for (int i = index + 1; i < arr.length; i++) {
-            if (arr[i] >= arr[i - 1]) {
+        for (int i = index; i < arr.length - 1; i++) {
+            if (arr[i] <= arr[i + 1]) {
                 return false;
             }
         }
@@ -38,40 +38,42 @@ class Solution {
     }
 }
 
+
 //Optimal Approach
 
 class Solution {
     public boolean validMountainArray(int[] arr) {
-        // Step 1: Check if the array has at least 3 elements, which is the minimum required for a mountain structure.
+        // A valid mountain array must have at least 3 elements:  one increasing part, a peak, and one decreasing part.
         if (arr.length < 3) {
             return false;
         }
 
         int i = 1;
 
-        // Step 2: Ascend to the peak of the mountain.
-        // Move forward while each element is greater than the previous one.
+        // Step 1: Traverse the strictly increasing (uphill) part.
         while (i < arr.length && arr[i] > arr[i - 1]) {
             i++;
         }
-         
+
         /*
-           Check peak validity:
-           - If i == 1, there’s no ascending part, so it’s not a mountain.
-           - If i == arr.length, the entire array is an ascending sequence without a descent.
-           In both cases, we don't have a valid peak for a mountain.
+         Peak validation:
+         - If i == 1, there is no increasing part (the array starts by decreasing).
+           Example: [9, 8, 7, 6, 5, 4, 3, 2, 1, 0]
+         - If i == arr.length, the array is strictly increasing with no decreasing part.
+           Example: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+
+         In both cases, a valid mountain peak does not exist.
         */
         if (i == 1 || i == arr.length) {
             return false;
         }
 
-        // Step 3: Descend the mountain after reaching the peak.
-        // Continue moving forward while each element is less than the previous one.
+        // Step 2: Traverse the strictly decreasing (downhill) part.
         while (i < arr.length && arr[i] < arr[i - 1]) {
             i++;
         }
 
-        // Step 4: If we've reached the end of the array after the descent, the array forms a valid mountain.
+        // Step 3: The array forms a valid mountain only if we reach the end after completing both uphill and downhill traversal.
         return i == arr.length;
     }
 }
